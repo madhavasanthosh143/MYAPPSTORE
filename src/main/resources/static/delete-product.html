@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delete Product</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #222;
+    }
+
+    .delete-confirmation {
+      text-align: center;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .delete-confirmation p {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      background-color: #f44336;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn:hover {
+      background-color: #e53935;
+    }
+
+    .btn-back {
+      background-color: #4CAF50;
+    }
+
+  </style>
+</head>
+<body>
+
+  <h1>Delete Product</h1>
+
+  <div class="delete-confirmation">
+    <p>Are you sure you want to delete <strong>India Gate Basmati Rice</strong> from the list?</p>
+    <button class="btn" onclick="deleteProduct()">Delete Product</button>
+    <button class="btn btn-back" onclick="window.location.href='index.html'">Cancel</button>
+  </div>
+
+  <script>
+    function deleteProduct() {
+      alert("Product deleted successfully!");
+      window.location.href = "index.html"; // Redirect to the product listing page
+    }
+  </script>
+
+</body>
+</html>

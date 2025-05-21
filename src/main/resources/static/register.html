@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register</title>
+  <style>
+    body {
+      background: url("https://images.unsplash.com/photo-1664455340023-214c33a9d0bd?auto=format&fit=crop&w=1600&q=80") no-repeat center center;
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial;
+    }
+
+    .box {
+      background: rgba(255, 255, 255, 0.8);
+      padding: 60px;
+      border-radius: 10px;
+      width: 300px;
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    input, button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+      transform: scale(1.05);
+    }
+
+    .error-message {
+      color: red;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Register</h2>
+    <input id="regUsername" placeholder="Username" />
+    <div id="usernameError" class="error-message"></div>
+
+    <input id="regPassword" placeholder="Password" type="password" />
+    <div id="passwordError" class="error-message"></div>
+
+    <button onclick="register()">Register</button>
+    <button onclick="window.location.href='login.html'">Go to Login</button>
+  </div>
+
+  <script>
+    function register() {
+      // Clear any previous error messages
+      document.getElementById("usernameError").innerHTML = '';
+      document.getElementById("passwordError").innerHTML = '';
+
+      const username = document.getElementById("regUsername").value;
+      const password = document.getElementById("regPassword").value;
+
+      // Client-side validation
+      if (!username || username.trim().length < 1 || username.trim().length > 20) {
+        document.getElementById("usernameError").innerHTML = "Username must be between 1 and 20 characters.";
+        return;
+      }
+
+      if (!password || password.trim().length < 7 || password.trim().length > 20) {
+        document.getElementById("passwordError").innerHTML = "Password must be between 7 and 20 characters.";
+        return;
+      }
+
+      // If client-side validation passes, proceed to backend API call
+      const user = {
+        userName: username,
+        password: password
+      };
+
+      fetch("http://localhost:9019/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(user)
+      }).then(res => {
+        if (res.ok) {	
+          alert("Registered successfully");
+          window.location.href = "login.html";
+        } else {
+          res.text().then(errorMessage => {
+            // Display backend error messages dynamically
+            if (errorMessage.includes("Username")) {
+              document.getElementById("usernameError").innerHTML = errorMessage;
+            } else if (errorMessage.includes("Password")) {
+              document.getElementById("passwordError").innerHTML = errorMessage;
+            }
+          });
+        }
+      }).catch(err => {
+        // Handle network errors
+        document.getElementById("usernameError").innerHTML = "An error occurred. Please try again later.";
+        document.getElementById("passwordError").innerHTML = "An error occurred. Please try again later.";
+      });
+    }
+  </script>
+</body>
+</html>
