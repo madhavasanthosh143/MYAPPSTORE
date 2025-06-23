@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Products</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #ffcccc, #ffe6e6);
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      padding: 15px;
+      text-align: center;
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .product-card h3 {
+      margin: 10px 0 5px;
+    }
+
+    .product-card .price {
+      font-weight: bold;
+      color: green;
+      margin: 5px 0;
+    }
+
+    .product-card button {
+      background-color: #ff6600;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .product-card button:hover {
+      background-color: #e65c00;
+    }
+
+    .cart-link {
+      display: block;
+      text-align: right;
+      margin: 10px 20px;
+    }
+
+    .cart-link a {
+      color: white;
+      background-color: #0099cc;
+      padding: 10px 15px;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Grocery Products</h1>
+<div class="cart-link">
+  <a href="cart.html">🛒 Go to Cart</a>
+</div>
+
+<div class="product-grid" id="productGrid"></div>
+
+<script>
+  async function loadProducts() {
+    try {
+      const response = await fetch('http://localhost:9019/products');
+      if (!response.ok) throw new Error("Failed to fetch");
+
+      const products = await response.json();
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = '';
+
+      if (products.length === 0) {
+        grid.innerHTML = '<p>No products found.</p>';
+        return;
+      }
+
+      products.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+
+        card.innerHTML = `
+          <img src="${product.imageUrl}" alt="${product.name}">
+          <h3>${product.name}</h3>
+          <p>${product.description}</p>
+          <div class="price">₹${product.price}</div>
+          <button>Add to Cart</button>
+        `;
+
+        const button = card.querySelector('button');
+        button.addEventListener('click', () => addToCart(product));
+        grid.appendChild(card);
+      });
+    } catch (err) {
+      console.error('Error loading products:', err);
+      document.getElementById('productGrid').innerHTML = '<p style="color:red">Could not load products.</p>';
+    }
+  }
+
+  function addToCart(product) {
+    fetch('http://localhost:9019/cart/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ productId: product.id })
+    })
+    .then(response => {
+      if (response.ok) {
+        window.location.href = 'cart.html';
+      } else {
+        alert("Failed to add product to cart");
+      }
+    })
+    .catch(error => {
+      console.error("Error adding to cart:", error);
+      alert("Something went wrong");
+    });
+  }
+
+  loadProducts();
+</script>
+
+</body>
+</html>

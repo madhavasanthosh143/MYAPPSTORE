@@ -1,15 +1,21 @@
 package com.example.ecommerce.Appstore.repository;
 
 import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.example.ecommerce.Appstore.model.Product;
-@Repository
-public interface ProductRepository extends JpaRepository<Product, Long> {
-	 
-	    List<Product> findByCategory(String category); // ✅ category-based query
-	}
+    @Repository
+	public interface ProductRepository extends JpaRepository<Product, Long> {
+		 
+		    List<Product> findByCategory(String category); // ✅ category-based query
+		    List<Product> findByNameContainingIgnoreCase(String name);
+		    List<Product> findByCategoryIgnoreCase(String category);
+		    List<Product> findBySubCategoryIgnoreCase(String subCategory);
+		    List<Product>  findById(long id);
+		    
 
 
+		}
+	
+	

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Cart</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #fbc2eb, #a6c1ee);
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+	.customer-info input {
+	  display: block;
+	  width: 100%;
+	  padding: 10px;
+	  margin: 8px 0;
+	  border-radius: 5px;
+	  border: 1px solid #ccc;
+	}
+
+
+    .cart-container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #ccc;
+      padding: 10px 0;
+    }
+
+    .cart-item img {
+      height: 80px;
+      width: 80px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-right: 10px;
+    }
+
+    .item-details {
+      flex-grow: 1;
+      padding-left: 10px;
+    }
+
+    .total-section {
+      text-align: right;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .payment-mode {
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    select {
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      background: #28a745;
+      color: white;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #218838;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛒 Your Cart</h1>
+
+  <div class="cart-container" id="cartItems"></div>
+
+  <div class="payment-mode">
+    <label for="paymentSelect">Select Payment Mode: </label>
+    <select id="paymentSelect">
+      <option value="UPI">UPI</option>
+      <option value="Cash On Delivery">Cash On Delivery</option>
+      <option value="Net Banking">Net Banking</option>
+    </select>
+  </div>
+
+  <div class="total-section" id="totalPrice">Total: ₹0</div>
+  <div class="customer-info" style="margin-bottom: 20px;">
+    <h2>Customer Details</h2>
+    <input type="text" id="customerName" placeholder="Full Name" required>
+    <input type="email" id="customerEmail" placeholder="Email" required>
+    <input type="tel" id="customerPhone" placeholder="Phone Number" required>
+    
+    <h2>Shipping Address</h2>
+    <input type="text" id="addressLine" placeholder="Street Address" required>
+    <input type="text" id="city" placeholder="City" required>
+    <input type="text" id="pincode" placeholder="Pincode" required>
+  </div>
+
+
+  <div style="text-align:center; margin-top: 20px;">
+    <button onclick="checkout()">Proceed to Checkout</button>
+  </div>
+
+  <script>
+    async function loadCart() {
+      try {
+        const res = await fetch("http://localhost:9019/cart/view");
+        const items = await res.json();
+        const cartDiv = document.getElementById('cartItems');
+        let total = 0;
+
+        cartDiv.innerHTML = '';
+
+        if (items.length === 0) {
+          cartDiv.innerHTML = '<p>Your cart is empty!</p>';
+          return;
+        }
+
+        items.forEach(item => {
+          total += item.totalPrice;
+
+          const div = document.createElement('div');
+          div.className = 'cart-item';
+          div.innerHTML = `
+            <img src="${item.product.imageUrl}" alt="${item.product.name}">
+            <div class="item-details">
+              <h3>${item.product.name}</h3>
+              <p>Price: ₹${item.product.price}</p>
+              <p>Quantity: ${item.quantity}</p>
+              <p>Subtotal: ₹${item.totalPrice}</p>
+            </div>
+          `;
+          cartDiv.appendChild(div);
+        });
+
+        document.getElementById('totalPrice').textContent = `Total: ₹${total.toFixed(2)}`;
+      } catch (err) {
+        console.error("Failed to load cart", err);
+      }
+    }
+
+    function checkout() {
+      const mode = document.getElementById('paymentSelect').value;
+	  
+
+      // Since cart is in session on backend, we don't need localStorage
+      const orderData = {
+        paymentMode: mode
+      };
+
+      fetch("http://localhost:9019/cart/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(orderData)
+      })
+        .then(response => {
+          if (response.ok) {
+            alert("✅ Order placed successfully via " + mode + "!");
+            window.location.href = "product-add.html"; // redirect after order
+          } else {
+            alert("❌ Failed to place order.");
+          }
+        })
+        .catch(error => {
+          console.error("Error during checkout:", error);
+          alert("❌ Something went wrong!");
+        });
+    }
+
+    loadCart();
+  </script>
+
+</body>
+</html>

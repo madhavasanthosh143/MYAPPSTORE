@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Verify OTP</title>
+  <style>
+    body {
+      background: url("https://images.unsplash.com/photo-1664455340023-214c33a9d0bd?auto=format&fit=crop&w=1600&q=80") no-repeat center center;
+      background-size: cover;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .box {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 50px 40px;
+      border-radius: 10px;
+      width: 320px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+      transform: scale(1.03);
+    }
+
+    .error-message {
+      color: red;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .success-message {
+      color: green;
+      font-size: 14px;
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Verify OTP</h2>
+
+    <input id="username" placeholder="Enter your username" />
+    <div id="usernameError" class="error-message"></div>
+
+    <input id="otp" placeholder="Enter OTP" />
+    <div id="otpError" class="error-message"></div>
+
+    <button onclick="verifyOtp()">Verify OTP</button>
+
+    <div id="responseMessage" class="success-message"></div>
+  </div>
+
+  <script>
+    function verifyOtp() {
+      document.getElementById("usernameError").innerText = "";
+      document.getElementById("otpError").innerText = "";
+      document.getElementById("responseMessage").innerText = "";
+
+      const userName = document.getElementById("username").value.trim();
+      const otp = document.getElementById("otp").value.trim();
+
+      if (!userName) {
+        document.getElementById("usernameError").innerText = "Username is required.";
+        return;
+      }
+
+      if (!otp) {
+        document.getElementById("otpError").innerText = "OTP is required.";
+        return;
+      }
+
+      const data = { userName, otp };
+
+      fetch("http://localhost:9019/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      .then(res => {
+        if (res.ok) {
+          return res.text().then(msg => {
+            document.getElementById("responseMessage").innerText = msg || "OTP verified successfully!";
+            setTimeout(() => {
+              window.location.href = "login.html";
+            }, 3000);
+          });
+        } else {
+          return res.text().then(msg => {
+            document.getElementById("otpError").innerText = msg?.trim() ? msg : "User not found";
+          });
+        }
+      })
+      .catch(() => {
+        document.getElementById("otpError").innerText = "Network error. Please try again.";
+      });
+    }
+  </script>
+</body>
+</html>

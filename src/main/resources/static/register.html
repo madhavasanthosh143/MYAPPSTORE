@@ -15,10 +15,10 @@
     }
 
     .box {
-      background: rgba(255, 255, 255, 0.8);
-      padding: 60px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 60px 40px;
       border-radius: 10px;
-      width: 300px;
+      width: 330px;
       box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
     }
 
@@ -27,35 +27,55 @@
       margin-top: 10px;
       padding: 12px;
       border-radius: 5px;
-      border: none;
+      border: 1px solid #ccc;
+      font-size: 14px;
     }
 
     button {
       background-color: #4CAF50;
       color: white;
+      border: none;
       cursor: pointer;
+      margin-top: 15px;
     }
 
     button:hover {
       background-color: #0056b3;
-      transform: scale(1.05);
+      transform: scale(1.03);
     }
 
     .error-message {
       color: red;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .success-message {
+      color: green;
       font-size: 14px;
-      margin-top: 5px;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    h2 {
+      text-align: center;
     }
   </style>
 </head>
 <body>
   <div class="box">
     <h2>Register</h2>
+
     <input id="regUsername" placeholder="Username" />
     <div id="usernameError" class="error-message"></div>
 
     <input id="regPassword" placeholder="Password" type="password" />
     <div id="passwordError" class="error-message"></div>
+
+    <input id="regEmail" placeholder="Enter your email" type="email" />
+    <div id="emailError" class="error-message"></div>
+
+    <div id="successMessage" class="success-message"></div>
 
     <button onclick="register()">Register</button>
     <button onclick="window.location.href='login.html'">Go to Login</button>
@@ -63,52 +83,69 @@
 
   <script>
     function register() {
-      // Clear any previous error messages
-      document.getElementById("usernameError").innerHTML = '';
-      document.getElementById("passwordError").innerHTML = '';
+      // Clear old messages
+      document.getElementById("usernameError").innerText = '';
+      document.getElementById("passwordError").innerText = '';
+      document.getElementById("emailError").innerText = '';
+      document.getElementById("successMessage").innerText = '';
 
-      const username = document.getElementById("regUsername").value;
-      const password = document.getElementById("regPassword").value;
+      const username = document.getElementById("regUsername").value.trim();
+      const password = document.getElementById("regPassword").value.trim();
+      const email = document.getElementById("regEmail").value.trim();
 
-      // Client-side validation
-      if (!username || username.trim().length < 1 || username.trim().length > 20) {
-        document.getElementById("usernameError").innerHTML = "Username must be between 1 and 20 characters.";
-        return;
+      let hasError = false;
+
+      if (username.length < 1 || username.length > 20) {
+        document.getElementById("usernameError").innerText = "Username must be between 1 and 20 characters.";
+        hasError = true;
       }
 
-      if (!password || password.trim().length < 7 || password.trim().length > 20) {
-        document.getElementById("passwordError").innerHTML = "Password must be between 7 and 20 characters.";
-        return;
+      if (password.length < 7 || password.length > 20) {
+        document.getElementById("passwordError").innerText = "Password must be between 7 and 20 characters.";
+        hasError = true;
       }
 
-      // If client-side validation passes, proceed to backend API call
+      if (!email) {
+        document.getElementById("emailError").innerText = "Email cannot be empty.";
+        hasError = true;
+      }
+
+      if (hasError) return;
+
       const user = {
         userName: username,
-        password: password
+        password: password,
+        email: email
       };
 
       fetch("http://localhost:9019/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(user)
-      }).then(res => {
-        if (res.ok) {	
-          alert("Registered successfully");
-          window.location.href = "login.html";
+      })
+      .then(res => {
+        if (res.ok) {
+          document.getElementById("successMessage").innerText = "Registered successfully. OTP sent to email.";
+          // Optional: redirect after 3s
+          setTimeout(() => {
+            window.location.href = "verify-otp.html"; // or login.html if not using OTP
+          }, 1000);
         } else {
           res.text().then(errorMessage => {
-            // Display backend error messages dynamically
             if (errorMessage.includes("Username")) {
-              document.getElementById("usernameError").innerHTML = errorMessage;
+              document.getElementById("usernameError").innerText = errorMessage;
             } else if (errorMessage.includes("Password")) {
-              document.getElementById("passwordError").innerHTML = errorMessage;
+              document.getElementById("passwordError").innerText = errorMessage;
+            } else if (errorMessage.toLowerCase().includes("email")) {
+              document.getElementById("emailError").innerText = errorMessage;
+            } else {
+              alert("Server error: " + errorMessage);
             }
           });
         }
-      }).catch(err => {
-        // Handle network errors
-        document.getElementById("usernameError").innerHTML = "An error occurred. Please try again later.";
-        document.getElementById("passwordError").innerHTML = "An error occurred. Please try again later.";
+      })
+      .catch(() => {
+        alert("Network error. Please try again.");
       });
     }
   </script>

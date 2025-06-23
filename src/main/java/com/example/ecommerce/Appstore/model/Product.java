@@ -1,6 +1,7 @@
 package com.example.ecommerce.Appstore.model;
 
 import jakarta.persistence.Entity;
+
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -14,24 +15,34 @@ public class Product {
     private String description;
     private double price;
     private String category;
-    private String imagUrl;
+    private String subCategory;
+    private String imageUrl;
 	 
-	public Product(Long id, String name, String description, double price,String category,String imgUrl) {
+	public Product(Long id, String name, String description, double price,String category,String imageUrl,String subCategory) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.price = price;
 		this.category = category;
-		this.imagUrl=imgUrl;
+		this.subCategory=subCategory;
+		this.imageUrl=imageUrl;
 	}
 	
-	public String getImagUrl() {
-		return imagUrl;
+	public String getImageUrl() {
+		return imageUrl;
 	}
 
-	public void setImagUrl(String imagUrl) {
-		this.imagUrl = imagUrl;
+	public String getSubCategory() {
+		return subCategory;
+	}
+
+	public void setSubCategory(String subCategory) {
+		this.subCategory = subCategory;
+	}
+
+	public void setImagUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 
 	public Product() {
