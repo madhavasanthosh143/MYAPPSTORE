@@ -24,7 +24,7 @@ public class CartService {
         Optional<Product> productOpt = productRepository.findById(productId);
         if (productOpt.isPresent()) {
             Product product = productOpt.get();
-
+            	
             CartItem item = new CartItem();
             item.setProduct(product);
             item.setQuantity(quantity);

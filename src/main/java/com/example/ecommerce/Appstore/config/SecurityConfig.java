@@ -21,7 +21,10 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/register","/register-page", "/login", "/login-page", "/h2-console/**").permitAll()
+                .requestMatchers("/register","/register-page", "/login", "/login-page", "/custom-logout", "/h2-console/**").permitAll()
+                .requestMatchers("/products/upload").hasRole("ADMIN")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/user/**").hasRole("USER")
                 .anyRequest().permitAll()
             )
             .headers(headers -> headers.frameOptions().disable()); // ✅ This line must be here

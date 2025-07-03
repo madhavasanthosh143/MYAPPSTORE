@@ -22,7 +22,7 @@
       box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
     }
 
-    input, button {
+    input, button, select {
       width: 100%;
       margin-top: 10px;
       padding: 12px;
@@ -75,6 +75,13 @@
     <input id="regEmail" placeholder="Enter your email" type="email" />
     <div id="emailError" class="error-message"></div>
 
+    <select id="regRole">
+      <option value="">-- Select Role --</option>
+      <option value="USER">User</option>
+      <option value="ADMIN">Admin</option>
+    </select>
+    <div id="roleError" class="error-message"></div>
+
     <div id="successMessage" class="success-message"></div>
 
     <button onclick="register()">Register</button>
@@ -83,15 +90,17 @@
 
   <script>
     function register() {
-      // Clear old messages
+      // Clear previous messages
       document.getElementById("usernameError").innerText = '';
       document.getElementById("passwordError").innerText = '';
       document.getElementById("emailError").innerText = '';
+      document.getElementById("roleError").innerText = '';
       document.getElementById("successMessage").innerText = '';
 
       const username = document.getElementById("regUsername").value.trim();
       const password = document.getElementById("regPassword").value.trim();
       const email = document.getElementById("regEmail").value.trim();
+      const role = document.getElementById("regRole").value;
 
       let hasError = false;
 
@@ -110,12 +119,18 @@
         hasError = true;
       }
 
+      if (!role) {
+        document.getElementById("roleError").innerText = "Please select a role.";
+        hasError = true;
+      }
+
       if (hasError) return;
 
       const user = {
         userName: username,
         password: password,
-        email: email
+        email: email,
+        role: role
       };
 
       fetch("http://localhost:9019/register", {
@@ -125,10 +140,9 @@
       })
       .then(res => {
         if (res.ok) {
-          document.getElementById("successMessage").innerText = "Registered successfully. OTP sent to email.";
-          // Optional: redirect after 3s
+          document.getElementById("successMessage").innerText = "✅ Registered successfully. OTP sent to email.";
           setTimeout(() => {
-            window.location.href = "verify-otp.html"; // or login.html if not using OTP
+            window.location.href = "verify-otp.html";
           }, 1000);
         } else {
           res.text().then(errorMessage => {
@@ -145,7 +159,7 @@
         }
       })
       .catch(() => {
-        alert("Network error. Please try again.");
+        alert("❌ Network error. Please try again.");
       });
     }
   </script>

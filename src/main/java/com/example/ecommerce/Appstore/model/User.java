@@ -16,14 +16,23 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
     @NotBlank(message = "Username is required.")
     @Size(min = 1, max = 20, message = "Username must be between 1 and 20 characters.")
     private String userName;
     @NotBlank(message = "Password is required.")
     @Size(min = 7, max = 100, message = "Password must be between 7 and 100 characters.") // changed max to 100
     private String password;
+    
+    private String role;
 
-    public boolean isVerified() {
+    public String getRole() {
+		return role;
+	}
+	public void setRole(String role) {
+		this.role = role;
+	}
+	public boolean isVerified() {
 		return Verified;
 	}
 	public void setVerified(boolean verified) {

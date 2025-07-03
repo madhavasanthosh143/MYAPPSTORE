@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Upload Product</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #ff9966, #ff5e62);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .upload-box {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .success {
+      color: green;
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .error {
+      color: red;
+      text-align: center;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="upload-box">
+    <h2>Upload Product</h2>
+    <input type="text" id="name" placeholder="Product Name" required />
+    <textarea id="description" placeholder="Product Description" rows="3" required></textarea>
+    <input type="number" id="price" placeholder="Price in ₹" required />
+    <input type="text" id="category" placeholder="Category (e.g., Fruits, Vegetables)" required />
+    <input type="text" id="subCategory" placeholder="Subcategory (e.g., Apple, Banana)" />
+    <input type="text" id="imageUrl" placeholder="Image URL (hosted image link)" required />
+    
+    <button onclick="uploadProduct()">Upload Product</button>
+
+    <div class="success" id="successMsg"></div>
+    <div class="error" id="errorMsg"></div>
+  </div>
+
+  <script>
+    function uploadProduct() {
+		const product = {
+		  name: document.getElementById("name").value,
+		  description: document.getElementById("description").value,
+		  price: parseFloat(document.getElementById("price").value),
+		  category: document.getElementById("category").value,
+		  subCategory: document.getElementById("subCategory").value,
+		  imageUrl: document.getElementById("imageUrl").value
+		};
+
+		fetch("http://localhost:9019/products/upload-multiple", {
+		  method: "POST",
+		  headers: {
+		    "Content-Type": "application/json"
+		  },
+		  credentials: "include",
+		  body: JSON.stringify([product]) // 🛠️ Wrap inside an array!
+		})
+		.then(res => res.text())
+		.then(message => {
+		  alert("✅ Upload success: " + message);
+		})
+		.catch(err => {
+		  alert("❌ Upload failed: " + err);
+		});
+
+    }
+  </script>
+
+</body>
+</html>

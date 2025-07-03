@@ -50,41 +50,43 @@
     <input type="text" id="username" placeholder="Username" required />
     <input type="password" id="password" placeholder="Password" required />
     <button onclick="login()">Login</button>
-	
+	<button onclick="window.location.href='/register.html'">Register</button>
 	<div style="text-align: center; margin-top: 10px;">
     <a href="forgot-password.html">Forgot Password?</a> 
 		  </div>
 
     <div id="loginErrorMsg" class="error"></div>
   </div>
-   
-
   <script>
-    function login() {
-      const user = {
-        userName: document.getElementById("username").value,
-        password: document.getElementById("password").value
-      };
+	function login() {
+	  const userName = document.getElementById("username").value;
+	  const password = document.getElementById("password").value;
 
-      fetch("http://localhost:9019/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(user)
-      })
-      .then(response => {
-        if (response.ok) {
-			
-		  window.location.href = "product-add.html";	
-		 
-        } else {
-          document.getElementById("loginErrorMsg").innerText = "Invalid username or password!";
-        }
-      })
-      .catch(error => {
-        document.getElementById("loginErrorMsg").innerText = "Login failed!";
-        console.error("Login error:", error);
-      });
-    }
+	  const user = { userName, password };
+
+	  fetch("http://localhost:9019/login", {
+	    method: "POST",
+	    headers: { "Content-Type": "application/json" },
+	    credentials: "include",  // Important if you're using session
+	    body: JSON.stringify(user)
+	  })
+	  .then(res => {
+	    if (!res.ok) return res.text().then(msg => { throw new Error(msg); });
+	    return res.json();
+	  })
+	  .then(data => {
+	    if (data.redirect) {
+	      window.location.href = data.redirect;
+	    } else {
+	      document.getElementById("errorMsg").innerText = data.error || "Login failed";
+	    }
+	  })
+	  .catch(error => {
+	    document.getElementById("errorMsg").innerText = "❌ " + error.message;
+	    console.error("Login error:", error);
+	  });
+	}
+
   </script>
 </body>
 </html>

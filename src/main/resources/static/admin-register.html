@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Registration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #007BFF, #FF4136);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px 40px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      width: 350px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      color: #333;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .message {
+      margin-top: 15px;
+      text-align: center;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Admin Registration</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+
+    <!-- ✅ Dropdown for role -->
+    <select id="role">
+      <option value="">Select Role</option>
+      <option value="ADMIN">ADMIN</option>
+      <option value="USER">USER</option>
+    </select>
+
+    <button onclick="registerAdmin()">Register as Admin</button>
+    <div class="message" id="message"></div>
+  </div>
+
+  <script>
+    function registerAdmin() {
+      const userName = document.getElementById("username").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const role = document.getElementById("role").value;
+      const msgBox = document.getElementById("message");
+
+      if (!userName || !email || !password || !role) {
+        msgBox.style.color = "red";
+        msgBox.textContent = "❌ All fields are required.";
+        return;
+      }
+
+      const data = { userName, email, password, role };
+
+      fetch("http://localhost:9019/admin-register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+        .then(response => {
+          if (response.ok) {
+            msgBox.style.color = "green";
+            msgBox.textContent = "✅ Admin registered successfully!";
+            setTimeout(() => window.location.href = "admin-login.html", 1500);
+          } else {
+            return response.text().then(msg => {
+              msgBox.style.color = "red";
+              msgBox.textContent = "❌ " + msg;
+            });
+          }
+        })
+        .catch(() => {
+          msgBox.style.color = "red";
+          msgBox.textContent = "❌ Network error. Try again.";
+        });
+    }
+  </script>
+</body>
+</html>

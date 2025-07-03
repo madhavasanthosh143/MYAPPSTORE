@@ -1,7 +1,7 @@
 package com.example.ecommerce.Appstore.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -17,10 +17,21 @@ public class Product {
     private String category;
     private String subCategory;
     private String imageUrl;
+    @Column(name = "user_name")
+    private String userName;
 	 
-	public Product(Long id, String name, String description, double price,String category,String imageUrl,String subCategory) {
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public Product(Long id, String name, String description, double price,String category,String imageUrl,String subCategory,String userName) {
 		super();
 		this.id = id;
+		this.userName = userName;
 		this.name = name;
 		this.description = description;
 		this.price = price;
