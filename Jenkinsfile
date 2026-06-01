@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Clone Code') {
             steps {
-                git branch: 'main',
+                git branch: 'master',
                     url: 'https://github.com/madhavasanthosh143/MYAPPSTORE.git'
             }
         }
