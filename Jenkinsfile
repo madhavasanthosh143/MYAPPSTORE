@@ -1,43 +1,52 @@
 pipeline {
     agent any
-
+    
     tools {
-        maven 'Maven-3.9.9'
+        maven 'maven3'
     }
-
+    
     environment {
-        IMAGE_NAME = "myappstore"
-        CONTAINER_NAME = "myapp"
-        PORT = "9019"
+        DOCKER_IMAGE = 'mmadhavasanthosh/myappstore'
+        DOCKER_TAG = "${BUILD_NUMBER}"
     }
-
+    
     stages {
-
-        stage('Checkout Code') {
+        stage('Clone Code') {
             steps {
-                git 'https://github.com/madhavasanthosh143/MYAPPSTORE.git'
+                git branch: 'main',
+                    url: 'https://github.com/madhavasanthosh143/MYAPPSTORE.git'
             }
         }
-
-        stage('Build Application') {
+        
+        stage('Maven Build') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean package -DskipTests'
             }
         }
-
-        stage('Build Docker Image') {
+        
+        stage('Docker Build') {
             steps {
-                sh 'docker build -t $IMAGE_NAME .'
+                sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
             }
         }
-
-        stage('Deploy Application') {
+        
+        stage('Push to Docker Hub') {
             steps {
-                sh '''
-                docker stop $CONTAINER_NAME || true
-                docker rm $CONTAINER_NAME || true
-                docker run -d -p $PORT:$PORT --name $CONTAINER_NAME $IMAGE_NAME
-                '''
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'USERNAME',
+                    passwordVariable: 'PASSWORD'
+                )]) {
+                    sh "docker login -u ${USERNAME} -p ${PASSWORD}"
+                    sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                }
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                sh "docker rm -f myappstore || true"
+                sh "docker run -d -p 9019:9019 --name myappstore ${DOCKER_IMAGE}:${DOCKER_TAG}"
             }
         }
     }
